@@ -4,7 +4,12 @@
 #
 # This file builds the plug-in base code
 
-include ../OdEnv.mk
+GMAT_Code_Location=../../../../src
+GMAT_Binary_Location=../../../../../../gmat-dslwp-binary/GMAT/R2019aBeta1
+C= gcc
+CPP= g++
+CFLAGS=-O2 -fPIC -g -Wall
+CPPFLAGS=$(CFLAGS)
 
 # handle different bin and lib directories here; for now, set to bin and lib for non-Mac platforms
 ifeq ($(PLATFORM), mac)
@@ -21,7 +26,7 @@ SHARED_EXTENSION = .dylib
 SHARED_LIB_FLAGS = -dylib -dynamiclib -undefined dynamic_lookup \
                    -L$(GMAT_Code_Location)/base/$(GMAT_LIB_DIR) -l$(BASE_LIBRARY) \
                     $(MAC_CPP_FLAGS) $(ARCHITECTURE_FLAGS) $(LINK_FLAGS) -lxerces-c-3.1
-                   
+
 # -reexport-lGmatBaseNoMatlab -dylib -dynamiclib -Wl -undefined dynamic_lookup
 
 else
@@ -36,6 +41,9 @@ SHARED_EXTENSION = .dll
 SHARED_LIB_FLAGS = -shared --out-implib $(LINK_FLAGS) -L$(GMAT_Code_Location)/base/$(GMAT_LIB_DIR) -lGmatBase
 
 endif
+
+SHARED_EXTENSION = .so
+SHARED_LIB_FLAGS = -shared -lf2c -lGmatBase -lGmatUtil -L$(GMAT_Binary_Location)/bin
 
 TARGET = ../../$(GMAT_LIB_DIR)/libGmatEstimation$(SHARED_EXTENSION)
 
@@ -103,12 +111,14 @@ HEADERS = -Iinclude \
           -Iplugin \
           -Ipropagator \
           -Imeasurement \
+	  -Imeasurementfile \
           -Imeasurement/Ionosphere \
           -Imeasurement/Troposphere \
           -Imeasurementmodel \
           -Ireporter \
           -Isignal \
           -Itrackingfile \
+	  -ItdmReader \
           $(DATAFILE_INCLUDES) \
           -I$(GMAT_Code_Location)/base/include \
           -I$(GMAT_Code_Location)/base/foundation \
@@ -138,7 +148,15 @@ HEADERS = -Iinclude \
           -I$(GMAT_Code_Location)/base/coordsystem \
           -I$(GMAT_Code_Location)/base/math \
           -I$(GMAT_Code_Location)/base/plugin \
-          -I$(GMAT_Code_Location)/base/estimator
+          -I$(GMAT_Code_Location)/base/estimator \
+	  -I$(GMAT_Code_Location)/gmatutil/include \
+	  -I$(GMAT_Code_Location)/gmatutil/util \
+	  -I$(GMAT_Code_Location)/base/factory/guicomponents \
+	  -I$(GMAT_Code_Location)/gmatutil/util/datawriter \
+	  -I$(GMAT_Code_Location)/base/forcemodel/harmonic \
+	  -I$(GMAT_Code_Location)/gmatutil/util/matrixoperations \
+          -I$(GMAT_Code_Location)/../depends/xerces/src \
+          -I$(GMAT_Code_Location)/../depends/xerces/linux-install/include
 
 clean : archclean
 
@@ -152,88 +170,105 @@ archclean :
 	rm -rf */core
 
 C_OBJECTS = \
-    $(IONOSPHERE_C_OBJECTS) 
+        measurement/Ionosphere/iri2007.o
 
 CPP_OBJECTS = \
-    plugin/GmatPluginFunctions.o \
-    adapter/TrackingDataAdapter.o \
-    adapter/RangeAdapterKm.o \
-    adapter/RangeRateAdapterKps.o \
-    adapter/PointRangeRateAdapterKps.o \
-    adapter/DSNRangeAdapter.o \
-    adapter/DopplerAdapter.o \
-    adapter/GNDopplerAdapter.o \
-    adapter/TDRSDopplerAdapter.o \
-    command/RunEstimator.o \
-    command/RunSimulator.o \
-    datafilter/DataFilter.o \
-    errormodel/ErrorModel.o \
-    estimator/Estimator.o \
-    estimator/BatchEstimator.o \
-    estimator/BatchEstimatorInv.o \
-    estimator/BatchEstimatorSVD.o \
-    estimator/SequentialEstimator.o \
-    estimator/ExtendedKalmanInv.o \
-    estimator/EstimationStateManager.o \
-    estimator/EstimatorException.o \
-    estimator/Simulator.o \
-    event/Event.o \
-    event/EventException.o \
-    event/EventData.o \
-    event/EventManager.o \
-    event/LightTimeCorrection.o \
-    event/EstimationRootFinder.o \
-    factory/ErrorModelFactory.o \
-    factory/EstimationCommandFactory.o \
-    factory/EstimationDataFilterFactory.o \
-    factory/EstimatorFactory.o \
-    factory/EventFactory.o \
-    factory/EstimatorHardwareFactory.o \
-    factory/MeasurementModelFactory.o \
-    factory/NavPropagatorFactory.o \
-    factory/TrackingDataFactory.o \
-    hardware/Sensor.o \
-    hardware/Signal.o \
-    hardware/RFHardware.o \
-    hardware/Transmitter.o \
-    hardware/Antenna.o \
-    hardware/Receiver.o \
-    hardware/Transponder.o \
-    measurement/CoreMeasurement.o \
-    measurement/MediaCorrection.o \
-    measurement/MeasurementData.o \
-    measurement/MeasurementManager.o \
-    measurement/MeasurementModelBase.o \
-    measurement/MeasurementModel.o \
-    measurement/PhysicalMeasurement.o \
-    measurement/TwoWayRange.o \
-    measurement/AveragedDoppler.o \
-    measurement/TrackingData.o \
-    measurement/Troposphere/Troposphere.o \
-    $(IONOSPHERE_CPP_OBJECTS) \
-    $(DATAFILE_OBJECTS) \
-    measurementmodel/MeasureModel.o \
-    propagator/RungeKutta4.o \
-    reporter/ProgressReporter.o \
-    signal/SignalBase.o \
-    signal/SignalData.o \
-    signal/PhysicalSignal.o \
-    trackingfile/TFSMagicNumbers.o \
-    trackingfile/TrackingFileSet.o
+        measurement/MeasurementModelBase.o \
+        measurement/MediaCorrection.o \
+        measurement/Ionosphere/Ionosphere.o \
+        measurement/Troposphere/Troposphere.o \
+        measurement/MeasurementData.o \
+        measurement/MeasurementManager.o \
+        trackingfile/TrackingFileSet.o \
+        trackingfile/TFSMagicNumbers.o \
+        factory/EstimationCommandFactory.o \
+        factory/SignalModelFactory.o \
+        factory/EstimatorHardwareFactory.o \
+        factory/EstimationDataFilterFactory.o \
+        factory/EventFactory.o \
+        factory/MeasurementModelFactory.o \
+        factory/ErrorModelFactory.o \
+        factory/NavPropagatorFactory.o \
+        factory/ObTypeFactory.o \
+        factory/DataFileFactory.o \
+        factory/EstimatorFactory.o \
+        measurementmodel/MeasureModel.o \
+        measurementmodel/GPSPointMeasureModel.o \
+        datafilter/RejectFilter.o \
+        datafilter/DataFilter.o \
+        datafilter/AcceptFilter.o \
+        event/LightTimeCorrection.o \
+        event/EventData.o \
+        event/EstimationRootFinder.o \
+        event/EventManager.o \
+        event/EventException.o \
+        event/Event.o \
+        tdmReader/TdmObType.o \
+        tdmReader/TdmReadWriter.o \
+        tdmReader/TdmErrorHandler.o \
+        plugin/GmatPluginFunctions.o \
+        reporter/ProgressReporter.o \
+        estimator/BatchEstimator.o \
+        estimator/Simulator.o \
+        estimator/EstimationStateManager.o \
+        estimator/Estimator.o \
+        estimator/EstimatorException.o \
+        estimator/BatchEstimatorBase.o \
+        command/RunSimulator.o \
+        command/RunEstimator.o \
+        adapter/GPSAdapter.o \
+        adapter/XSouthAdapter.o \
+        adapter/DopplerAdapter.o \
+        adapter/RightAscAdapter.o \
+        adapter/YEastAdapter.o \
+        adapter/PointRangeRateAdapterKps.o \
+        adapter/GNDopplerAdapter.o \
+        adapter/YNorthAdapter.o \
+        adapter/TDRSRangeAdapter.o \
+        adapter/DSNRangeAdapter.o \
+        adapter/ElevationAdapter.o \
+        adapter/GNRangeAdapter.o \
+        adapter/XEastAdapter.o \
+        adapter/DeclinationAdapter.o \
+        adapter/TrackingDataAdapter.o \
+        adapter/AzimuthAdapter.o \
+        adapter/RangeAdapterKm.o \
+        adapter/TDRSDopplerAdapter.o \
+        adapter/RangeRateAdapterKps.o \
+        adapter/AngleAdapterDeg.o \
+        errormodel/ErrorModel.o \
+        hardware/RFHardware.o \
+        hardware/Receiver.o \
+        hardware/Transmitter.o \
+        hardware/Transponder.o \
+        hardware/Signal.o \
+        hardware/Sensor.o \
+        hardware/Antenna.o \
+        propagator/RungeKutta4.o \
+        signal/SignalBase.o \
+        signal/SignalData.o \
+        signal/SinglePointSignal.o \
+        signal/PhysicalSignal.o \
+        measurementfile/RampTableType.o \
+        measurementfile/DataFile.o \
+        measurementfile/GmatObType.o \
+        measurementfile/GmatData.o \
+        measurementfile/RampTableData.o \
+        measurementfile/ObservationData.o \
+        measurementfile/B3_obtype.o \
+        measurementfile/ObType.o \
+        measurementfile/DataFileAdapter.o
 
-#    measurementfile/DataFileAdapter.o \
 
 ifeq ($(PLATFORM), mac)
 $(TARGET) : $(C_OBJECTS) $(CPP_OBJECTS)
 	mkdir -p ../../$(GMAT_LIB_DIR)
 	$(CPP) $(C_OBJECTS) $(CPP_OBJECTS) -o $(TARGET) $(SHARED_LIB_FLAGS) $(PLATFORM_FLAGS)
 	install_name_tool -change $(GMAT_LIB_DIR)/lib$(BASE_LIBRARY).dylib $(BASE_LIB_LOCATION)lib$(BASE_LIBRARY).dylib $(TARGET)
-	cp $(TARGET) $(GMAT_Plugin_Location)/../$(GMAT_PLUGIN_DIR)
 else
 $(TARGET) : $(C_OBJECTS) $(CPP_OBJECTS)
 	mkdir -p ../../$(GMAT_LIB_DIR)
 	$(CPP) $(C_OBJECTS)  $(CPP_OBJECTS) -o $(TARGET) $(SHARED_LIB_FLAGS) $(PLATFORM_FLAGS)
-	cp $(TARGET) $(GMAT_Bin_Location)/../$(GMAT_PLUGIN_DIR)
 endif
 
 
