@@ -2551,12 +2551,13 @@ Integer PhysicalSignal::FrequencyBand(Real frequency)
    if ((frequency >= 7000000000.0) && (frequency <= 8400000000.0))
       freqBand = 2;               // 2 for X-band
 
-   if (freqBand == 0)
+   // we allow frequencies outside specified bands
+   /*if (freqBand == 0)
    {
       std::stringstream strs;
       strs << "Error in PhysicalMeasurement::FrequencyBand():  GMAT cannot specify frequency band for frequency = " << frequency <<" Hz\n";
       throw MeasurementException(strs.str());
-   }
+   }*/
 
    return freqBand;
 }
