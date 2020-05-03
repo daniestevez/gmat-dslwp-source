@@ -38,7 +38,7 @@
 //#define DEBUG_CONSTRUCTION
 //#define DEBUG_SET_PARAMETER
 //#define DEBUG_INITIALIZATION
-//#define DEBUG_RANGE_CALCULATION
+#define DEBUG_RANGE_CALCULATION
 //#define DEBUG_INITIALIZE
 
 //------------------------------------------------------------------------------
