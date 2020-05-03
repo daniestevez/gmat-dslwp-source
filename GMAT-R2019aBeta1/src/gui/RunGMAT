@@ -1,0 +1,124 @@
+#!/bin/bash
+# Sets up the environment for GMAT, then runs the executable.
+#
+#  Copyright (c) 2002-2018 United States Government as represented by the
+#  Administrator of The National Aeronautics and Space Administration.
+#  All Other Rights Reserved.
+#
+# This assumes that the user has set the MATLAB_APP_PATH in her/his
+# MATLABConfigure.txt file and that this file resides in the
+# bin folder where the GMAT.app bundle resides.
+# MATLAB_APP_PATH should point to the MATLAB app in the directory where MATLAB
+# has been installed, e.g.
+#     /Applications/MATLAB_R2017b.app
+# NOTE that currently, we are running 64-bit GUI versions of GMAT and therefore,
+# we need to use 64-bit version(s) of MATLAB here.
+#
+# To debug errors, set the debugit flag to 'yesdoit'.  By default, debug is
+# written to a file inside the bundle in the directory from which this script is
+# run.  This may be changed to write to a different file by setting debugfile
+# (see below).
+#
+
+# we need the absolute path to this script
+here="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Set debug file and flag here ......................
+debugfile="$here/debugrungmat.txt"
+# uncomment the next line for debug output
+# debugit='yesdoit'
+if [ "$debugit" = 'yesdoit' ]
+then
+   echo "The value of debugfile is "$debugfile"" > "$debugfile"
+fi
+# ...................................................
+
+
+# What do we want to run?
+#cmd="$( ls -1 "$here"/GMAT* | xargs basename )" # Supports release & debug GMAT
+# NOTE - the debug app GMATd does not work here yet!!!
+if [ -f "$here/GMAT" ]
+then
+cmd="GMAT"
+elif [ -f "$here/GMATd" ]
+then
+cmd="GMATd"
+else
+   echo "CANNOT find GMAT executable!!!" >> "$debugfile"
+   exit 1
+fi
+# Where is the MATLAB config file?  It has to be in the bin directory for now
+FILE="$here/../../../MATLABConfigure.txt"
+
+# begin debugging
+if [ "$debugit" = 'yesdoit' ]
+then
+   echo "DEBUG " >> "$debugfile"
+   echo "The meaning of here is "$here"" >> "$debugfile"
+   echo "The meaning of cmd is "$cmd"" >> "$debugfile"
+   pwd >> "$debugfile"
+   if [ -f "$FILE" ]
+   then
+      echo "Now about to read file $FILE" >> "$debugfile"
+   else
+      echo "DOES NOT EXIST -  file $FILE" >> "$debugfile"
+      exit 1
+   fi
+fi
+# end debugging
+
+# turn ON extended globbing
+shopt -s extglob
+
+keyword="MATLAB_APP_PATH" 
+keylen=${#keyword}
+
+# read until we find the matlab location keyword
+# then strip off leading blanks, the equal sign,
+# leading blanks (again), then trailing blanks
+while read line
+   do
+      case "$line" in
+      ${keyword}*)
+         value=${line:$keylen}
+         matlabloc=${value##+([[:space:]])}
+         matlabloc=${matlabloc#=}
+         matlabloc=${matlabloc##+([[:space:]])}
+         matlabloc=${matlabloc%%+([[:space:]])}
+      ;;
+      esac
+   done < "$FILE"
+
+# begin debugging
+if [ "$debugit" = 'yesdoit' ]
+then
+   echo "value is |$value|"  >> "$debugfile"
+   echo "setting matlab location to |$matlabloc|"  >> "$debugfile"
+fi
+# end debugging
+
+if [ -n "$matlabloc" ]
+then
+   if [ -d "$matlabloc" ]
+   then
+      export DYLD_LIBRARY_PATH="$matlabloc/bin/maci64:$matlabloc/sys/os/maci64:$DYLD_LIBRARY_PATH"
+      export PATH="$matlabloc/bin:$PATH"
+   fi
+fi
+
+
+# turn OFF extended globbing
+shopt -u extglob
+
+# for CSPICE
+ulimit -s 61440
+
+# begin debugging
+if [ "$debugit" = 'yesdoit' ]
+then
+   echo "NOW running GMAT at location |$here/$cmd|"  >> "$debugfile"
+fi
+# end debugging
+
+# We need this dollar-sign-at-sign thing here in order to pass arguments into GMAT!!!
+exec "$here/$cmd" "$@"

@@ -1,0 +1,386 @@
+Welcome to the wonderful world of GMAT!
+
+GMAT is a software system for space mission design, navigation, and optimization applicable to missions anywhere in the solar system ranging from low Earth orbit to lunar, Liberation point, and deep space missions. The system contains high-fidelity space system models, optimization and targeting, built-in scripting and programming infrastructure, and customizable plots, reports and data products, to enable flexible analysis and solutions for custom and unique applications. GMAT can be driven from a fully featured, interactive Graphical User Interface (GUI), or from a custom script language. 
+
+The system is implemented in ANSI standard C++ using an Object Oriented methodology, with a rich class structure designed to make new features easy to incorporate. GMAT has been used extensively as a design tool for many missions including LCROSS, ARTEMIS and LRO and for operational support of TESS, SOHO, WIND, ACE, and SDO.
+
+-----------------------------------------------------------------------
+                          License and Copyright
+-----------------------------------------------------------------------
+
+Copyright (c) 2002 - 2018 United States Government as represented by
+the Administrator of the National Aeronautics and Space Administration.
+All Other Rights Reserved.
+
+GMAT is licensed under the Apache License, Version 2.0 found
+in the License.txt file contained in this distribution.
+
+-----------------------------------------------------------------------
+                           Contact Information
+-----------------------------------------------------------------------
+
+For general project info see: http://gmatcentral.org
+
+For source code and application distributions see:
+http://sourceforge.net/projects/gmat/
+
+For other comments and questions, email: gmat@gsfc.nasa.gov
+
+-----------------------------------------------------------------------
+                      Credits and Acknowledgments
+-----------------------------------------------------------------------
+GMAT uses:
+- wxWidgets 3.0.2 (http://www.wxwidgets.org/) 
+- TSPlot (http://sourceforge.net/projects/tsplot/)
+- SPICE (http://naif.jpl.nasa.gov/naif/toolkit.html)
+- SOFA (http://www.iausofa.org/)
+- Apache Xerces (http://xerces.apache.org)
+- JPL SPICE (https://naif.jpl.nasa.gov/naif/)
+- Boost (http://www.boost.org/)
+
+Planetary images are courtesy of: 
+- JPL/Caltech/USGS (http://maps.jpl.nasa.gov/)
+- Celestia Motherlode (http://www.celestiamotherlode.net/)
+- Bjorn Jonsson (http://www.mmedia.is/~bjj/)
+- NASA World Wind (http://worldwind.arc.nasa.gov/)
+
+Some icons are courtesy of Mark James ( http://www.famfamfam.com/ )
+
+-----------------------------------------------------------------------
+                      Installation and Configuration
+-----------------------------------------------------------------------
+
+WINDOWS
+
+The GMAT Windows distribution contains an installer that will
+install and configure GMAT for you automatically. The installer
+does not require administrative privileges, and will install by
+default to your personal %LOCALAPPDATA% folder. This can be customized
+during installation.
+
+LINUX
+
+There are two precompiled Linux distributions of GMAT, packaged as 
+compressed TAR files, ready for expansion and use.  The precompiled 
+releases were built and tested on Ubuntu 16.04 LTS and on Red Hat 
+Enterprise Linux 7.2.  Linux users on those platforms can download the 
+tarball file and uncompress it into place using the command
+
+    tar -zxf <TarballPackageName>
+
+where <TarballPackageName> is either gmat-ubuntu-x64-R2018a.tar.gz
+or gmat-rhel7-x64-R2018a.tar.gz. 
+
+UBUNTU 18.04 Note:  Ubuntu 18.04 does not ship with libpng12.so, used by
+the wxWidgets libraries bundled with the Ubuntu installation.  You can 
+download the needed library from the Ubuntu packages site
+
+   https://packages.ubuntu.com/xenial/amd64/libpng12-0/download
+
+Download the package and install it using the Ubuntu package manager.
+
+MAC
+
+The Mac distribution is packaged as a ZIP file, gmat-macosx-x64-R2018a.zip, 
+ready for expansion and use.  This prebuilt release was built and tested on 
+Mac OS X 10.12.
+
+Mac users can download the zip archive and uncompress it into place
+by double-clicking it in the Finder.
+
+NOTE that there is a Gatekeeper/translocation issue with OS X Sierra and High
+Sierra.  Since the GMAT application is currently unsigned, the Gatekeeper will
+not allow it to run in the bin folder and will make a copy of it in a 
+temporary location.  This can be fixed manually by doing the following:
+
+1. Open the Finder
+2. Browse to the location of the GMAT application (in the bin folder)
+3. Using the Finder, drag the application only (not the entire bin 
+folder!) to a different location (e.g. the Desktop)
+4. Drag and drop the GMAT application back into the bin folder
+
+This will clear the ‘UseAppTranslocation’ flag in the OS and will allow
+GMAT to be run from the bin folder.
+
+A future release of GMAT will address the signing issue further.
+
+BUILDING FROM SOURCE
+
+GMAT is distributed in source form as well, and can be compiled on OS X,
+Linux and Windows. Build instructions for GMAT can be found at
+http://gmatcentral.org/display/GW/GMAT+CMake+Build+System.
+
+-----------------------------------------------------------------------
+                           Running GMAT
+-----------------------------------------------------------------------
+
+WINDOWS
+
+On Windows 7, click Start, and then point to All Programs. Point to 
+GMAT, GMAT R2018a, and then click GMAT R2018a.
+
+On Windows 10, point to the Start menu, scroll to the GMAT folder in
+the applications list, and select GMAT R2018a.
+
+If you are using the zip-file bundle, double-click the 
+bin\GMAT.exe application.
+
+LINUX
+
+On Linux, open a terminal window and change directories to the GMAT bin 
+folder.  The GMAT command line program is executed by running the 
+GmatConsole application in that folder:
+
+   ./GmatConsole
+
+The Beta GUI can be run using the same terminal window by running 
+Gmat_Beta:
+
+   ./GMAT_Beta
+
+Linux users can create a launcher for either the command line 
+application or the GUI application by following the instructions for 
+that process for their Linux distribution.
+
+MATLAB interface note for Linux users:
+
+If the Matlab interface does not work with the GmatConsole command line 
+application (or the GMAT_Beta GUI), you may need to set the library load 
+path to include the path to your installed Matlab libraries.  For example, 
+if MATLAB is installed in the /usr/local/MATLAB/R2016b folder and the GMAT 
+console application is not loading the MATLAB plugin, you may need to 
+update the library path before starting the application, like this:
+
+export LD_LIBRARY_PATH=/usr/local/MATLAB/R2016b/bin/glnxa64:./libwx:$LD_LIBRARY_PATH 
+./GmatConsole
+
+Finally, the MATLAB engine used in the Linux release runs under the C shell, 
+csh.  If you plan to use the MATLAB interface, make sure that you have csh
+installed on your Linux machine.
+
+MAC
+
+On OS X, open a Terminal window and navigate to the GMAT bin folder.  The 
+GMAT command line program is executed by running the GmatConsole 
+application in that folder:
+
+   ./GmatConsole
+
+The Beta GUI application can be run using the ‘open’ Terminal command, 
+executed in the bin folder:
+
+   open GMAT-R2018a_Beta.app
+
+or by double-clicking the GMAT-R2018a_Beta.app in the Finder.  If running
+GMAT fails and you see an error message about GMAT not being able to 
+read the startup file in a temporary location that includes 
+“AppTranslocation” in the path, see the note above about the Gatekeeper and
+OS X Sierra (and High Sierra).
+
+Python Interface note for Mac users:
+
+Currently, GMAT will only be able to interface with Python if your Python 
+is installed into a specific directory: 
+/Library/Frameworks/Python.framework/Versions/3.6 
+
+GMAT will be updated for a future release to allow use of a 
+Python installation elsewhere.
+
+MATLAB interface note for Mac users:
+
+To use the Matlab interface with the Mac GMAT-R2018a_Beta.app application, 
+you must open the MATLABConfigure.txt in the bin directory and edit the 
+MATLAB_APP_PATH field to point to the location of your MATLAB installation. 
+
+If the Matlab interface does not work with the GmatConsole command line 
+application, you may need to set up your Terminal so that the system can
+load the Matlab libraries and start up MATLAB.  For example, if you 
+are using a .bashrc, you may need to add something like this:
+
+export MATLAB = <your MATLAB app location here>
+export DYLD_LIBRARY_PATH=$MATLAB/bin/maci64:$DYLD_LIBRARY_PATH
+export PATH=$PATH:$MATLAB/bin
+
+Note for MacBooks with a Touch Bar:
+
+There appears to be an issue with WxWidgets, the third party GUI library
+used by GMAT, and the Mac Touch Bar.  Crashes occur frequently and the
+traceback indicates that the issue lies in Apple code, related to the Touch
+bar specifically, possibly caused by a NULL string pointer.  Our analysis
+suggests this issue cannot be addressed by the GMAT team or by WxWidgets;
+however, we will continue to investigate.  In the meantime, the GMAT Console
+version will continue to work, and the GUI version (Beta) will work on Macs
+without a Touch Bar.
+
+
+-----------------------------------------------------------------------
+                           User Information
+-----------------------------------------------------------------------
+
+User docs are available in pdf and html format.  The pdf documentation
+is distributed in letter and A4 size in this package.  The files are
+located here: /doc/help/help-letter.pdf and /doc/help/ help-a4.pdf
+Online documentation is available here: http://gmat.sf.net/docs.
+
+For new users, see the Getting Started and Tour of GMAT sections first,
+then take the tutorials.  The tutorials are included in print versions
+in the help documents, and are available in video form here:
+https://www.youtube.com/channel/UCt-REODJNr2mB3t-xH6kbjg
+
+For a list of new functionality, compatibility changes, and known issues,
+see the Release Notes section in the user guide.  
+
+-----------------------------------------------------------------------
+                         Developer Information
+----------------------------------------------------------------------
+
+Source code is available here:
+https://sourceforge.net/p/gmat/git/
+
+Compilation instructions are available here: 
+http://gmatcentral.org/display/GW/GMAT+CMake+Build+System
+
+Design Documentation is available at the links below:
+http://gmatcentral.org/display/GW/Design+Documents
+http://gmatcentral.org/display/GW/How+To+Write+New+Components
+
+You can sign up for mailing lists here:
+https://sourceforge.net/p/gmat/mailman/
+
+-----------------------------------------------------------------------
+                         New Capabilities
+----------------------------------------------------------------------
+
+Functionality new in release R2019a BETA v0.2                                 
+
+CSALT:                                                                        
+
+- improved finite differencing of boundary functions                          
+
+- improved optimization behavior during mesh refinement                        
+
+- new interface for algebraic functions                                        
+
+- Addressed memory leak                                      
+
+- New publisher interface                                                     
+
+- Support for static variables                                                 
+
+- Ability to set user defined perturbations for finite differencing                                                                                         
+
+GMAT CSALT Interface: 
+
+- Ability to use EMTG thruster models 
+
+- Selected analytic time Jacobians 
+
+- Analytic mass Jacobians 
+
+- Analytic control Jacobians 
+
+- Added scriptable optimizer settings 
+
+- Added scripted configuration of mesh refinement algorithm 
+
+- Added ability to define upper and lower bounds on control mag 
+
+- Added ASCII file output for optimal control solutions
+
+- Added ASCII file constraint solution report 
+
+- Numerous built-in functions for optimal control including simple linkage,ustom linkage, rendezvous, mass, time constraints. 
+
+- Added ability to define guesses from arrays or files. 
+
+- Refactored assignment command to eventually support user-scripted constraints
+
+- Implemented built-in non-dimensionatization. 
+
+- Added coordinate transformations and non-dimensionalization of guess data
+
+
+
+SPAD Improvements: 
+
+- New SPAD drag model capability
+
+- Added orbit determination drag/SRP solve-for capability 
+
+- added new interpolation method option 
+
+
+
+New 3D Visualization Plugin:
+
+There is a new plugin called OpenFramesInterface for 3D visualizations developed under SBIR Phase II contract NNX16CG16C. OpenFramesInterface is in alpha development state, but it is planned to replacethe OrbitView component in a future release. This plugin uses the OpenFrames API, and enables multithreaded high-performance visualizations for all GMAT scripts. Key features of the plugin include: 
+
+- User-defined views of any spacecraft or celestial body. Views can be body-fixed, coordinate system-fixed,or look from one body towards another.                                                     
+
+- Multithreaded visualizations make use of multiple processor cores, resulting in a general computation speedup throughout GMAT when compared to OrbitView. 
+
+- Full control over simulation time.View scene at any time, animate at various time scales, and synchronize  time between multiple OpenFramesInterface windows. 
+
+- Granular control over displayed objects. Choose whether to plot axes, bodies, trajectories, or a slew of other per-body graphics options. -Most graphics option changes do not require a mission rerun. This includes switching between user-defined views andenabling/disabling displayed objects. 
+
+- High-fidelity rendering. Multisample antialiasing (MSAA, depends on computer), accurate lighting, accurate star map with star colors and sizes  (HYGv3 database) 
+
+- Virtual Reality support via  OpenVR. Any scene can be visualized on OpenVR-compatible hardware, including the Oculus Rift or HTC Vive. 
+
+- Compatible with any GMAT script that runs on R2018a.       
+
+> Note: OrbitView will continue to be supported for backward compatibility purposes but will only be modified for critical bug fixes.                                                 
+
+Other Improvements:
+
+- There are several new built in GMAT functions: pause, GetSystemTime, str2num, and sign, and GetRotationMatrix.
+
+- There is a preliminary interface to use the GMAT python interface and python sockets to bring in raw telemetry data into GMAT.
+
+- Bug fixes for the Yukon optimizer
+
+- A new graphical interface, DynamicDataDisplay, allows display of numeric and text data during system execution and can optionally color code the data based on user defined constraints.
+
+- There is a new, generic density model plugin to allow third-party implementation of custom density models. Note, this is a C++ interface and adding new density models requires working in GMAT code and compiling GMAT.
+
+- There is a new, minimally tested interface to SNOPT that allows users to provide precompiled versions of SNOPT 7.5. Previous versions of GMAT had SNOPT compiled directly into the SNOPT plugin, which prohibits release.
+
+- Updates to the beta polyhedral gravity model allow polyhedral regions with non-uniform density.
+
+- Prototype sensor models (not integrated into GMAT) support a rectangular sensor model.
+
+- The script editor now supports syntax highlighting.
+
+- The CSALT interface, which employs high order collocation for low thrust optimization now supports multiple phases in different coordinate systems, EMTG thrust models, automatic full time-state linkage constraints. This interface is still alpha.
+
+- Added capability to put a ground station on any celestial body.
+
+- Orbit Determination
+
+oSignificant refactoring of estimation code to prepare for implementation of an extended Kalman Filter with smoother.
+
+oInner loop sigma editing for batch estimator.
+
+oPrototype thrust scale factor solve-for when performing OD with thrust file models.
+
+oAlpha-level batch capability to process select angle data types
+
+For a complete list of changes made in previous versions of GMAT see the Release 
+Notes section of the user guide.
+
+-----------------------------------------------------------------------
+                         Developer Information
+----------------------------------------------------------------------
+
+Source code is available here:
+https://sourceforge.net/p/gmat/git/
+
+Compilation instructions are available here: 
+http://gmatcentral.org/display/GW/GMAT+CMake+Build+System
+
+Design Documentation is available at the links below:
+http://gmatcentral.org/display/GW/Design+Documents
+http://gmatcentral.org/display/GW/How+To+Write+New+Components
+
+You can sign up for mailing lists here:
+https://sourceforge.net/p/gmat/mailman/
