@@ -236,6 +236,7 @@ CPP_OBJECTS = \
         adapter/TDRSDopplerAdapter.o \
         adapter/RangeRateAdapterKps.o \
         adapter/AngleAdapterDeg.o \
+        adapter/DeltaRangeAdapter.o \
         errormodel/ErrorModel.o \
         hardware/RFHardware.o \
         hardware/Receiver.o \

@@ -918,7 +918,8 @@ StringArray ErrorModel::GetAllAvailableTypes()
    sa.push_back("YEast");
    //sa.push_back("RightAscension");                           // made changes by TUAN NGUYEN
    //sa.push_back("Declination");                              // made changes by TUAN NGUYEN
-
+   sa.push_back("DeltaRange");
+   
    Integer runmode = GmatGlobal::Instance()->GetRunModeStartUp();        // fix bug: GMT-5955
    if (runmode == GmatGlobal::TESTING)                                   // fix bug: GMT-5955
    {

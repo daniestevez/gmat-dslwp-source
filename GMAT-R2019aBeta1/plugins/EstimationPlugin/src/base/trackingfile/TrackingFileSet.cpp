@@ -43,6 +43,7 @@
 #include "YEastAdapter.hpp"
 #include "RightAscAdapter.hpp"
 #include "DeclinationAdapter.hpp"
+#include "DeltaRangeAdapter.hpp"
 
 //#define DEBUG_CONSTRUCTION
 //#define DEBUG_INITIALIZATION
@@ -2729,6 +2730,25 @@ TrackingDataAdapter* TrackingFileSet::BuildAdapter(const StringArray& strand,
       {
          retval->UsesLightTime(useLighttime);
          retval->SetStringParameter("MeasurementType", type);
+      }
+   }
+   else if (type == "DeltaRange")                             // It is DeltaRange
+   {
+      retval = new DeltaRangeAdapter(adapterName);
+      if (retval)
+      {
+         retval->UsesLightTime(useLighttime);
+         retval->SetStringParameter("MeasurementType", type);
+
+	 StringArray referenceStrand, otherStrand;
+	 if (strand.size() != 3)
+	   throw MeasurementException("Error: Signal path does not contain 3 participants.\n");
+	 referenceStrand.push_back(strand[1]);
+	 referenceStrand.push_back(strand[0]);
+	 otherStrand.push_back(strand[1]);
+	 otherStrand.push_back(strand[2]);
+	 ((DeltaRangeAdapter*)retval)->referenceLeg = (RangeAdapterKm*)BuildAdapter(referenceStrand, "Range", configIndex);
+	 ((DeltaRangeAdapter*)retval)->otherLeg = (RangeAdapterKm*)BuildAdapter(otherStrand, "Range", configIndex);
       }
    }
    else                                                               

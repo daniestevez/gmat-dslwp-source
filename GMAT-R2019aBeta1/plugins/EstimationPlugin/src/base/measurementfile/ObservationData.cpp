@@ -264,6 +264,7 @@ StringArray ObservationData::GetAvailableMeasurementTypes()
    typeList.push_back("YEast");
    //typeList.push_back("RightAscension");          // made changes by TUAN NGUYEN
    //typeList.push_back("Declination");             // made changes by TUAN NGUYEN
+   typeList.push_back("DeltaRange");
 
    Integer runmode = GmatGlobal::Instance()->GetRunModeStartUp();   // made changes by TUAN NGUYEN
    if (runmode == GmatGlobal::TESTING)                              // made changes by TUAN NGUYEN

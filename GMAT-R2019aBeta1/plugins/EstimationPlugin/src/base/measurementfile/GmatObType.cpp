@@ -573,7 +573,8 @@ ObservationData* GmatObType::ReadObservation()
          || (currentObs.typeName == "Azimuth") || (currentObs.typeName == "Elevation")
          || (currentObs.typeName == "XEast") || (currentObs.typeName == "YNorth")
          || (currentObs.typeName == "XSouth") || (currentObs.typeName == "YEast")
-         || (currentObs.typeName == "RightAscension") || (currentObs.typeName == "Declination"))
+         || (currentObs.typeName == "RightAscension") || (currentObs.typeName == "Declination")
+	  || (currentObs.typeName == "DeltaRange"))
       {
          dataSize = 1;
       }
@@ -635,7 +636,7 @@ ObservationData* GmatObType::ReadObservation()
 
 
    //if ((currentObs.typeName == "Range_KM") || (currentObs.typeName == "GPS_PosVec"))
-   if ((currentObs.typeName == "Range") || (currentObs.typeName == "SN_Range") || (currentObs.typeName == "GPS_PosVec"))
+   if ((currentObs.typeName == "Range") || (currentObs.typeName == "SN_Range") || (currentObs.typeName == "GPS_PosVec") || (currentObs.typeName == "DeltaRange"))
    {
       currentObs.unit = "km";
    }
