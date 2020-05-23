@@ -1018,13 +1018,13 @@ TFSMagicNumbers::TFSMagicNumbers() :
    // Deltarange
    lastNumber = DELTARANGE_TYPE_INDEX;
    lue = new LookupEntry;
-   lue->arbitraryCount = false;
+   lue->arbitraryCount = true;
    lue->signalPathCount = 1;
    lue->nodeCount = 2;
    nodes.clear();
    nodes.push_back("T1");
    nodes.push_back("S1");
-   nodes.push_back("T1");
+   nodes.push_back("T2");
    lue->nodes.push_back(nodes);
    lue->type = "DeltaRange";                         // Deltarange measurement
    lue->multFactor = 1.0;
