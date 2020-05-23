@@ -481,7 +481,7 @@ const MeasurementData& DeltaRangeAdapter::CalculateMeasurement(bool withEvents,
       instanceName + " before the measurement was set");
 
    // Compute range for reference leg
-   referenceLeg->CalculateMeasurement(withLighttime, forObservation, rampTB, forSimulation); // TODO check error
+   referenceLeg->CalculateMeasurement(withLighttime, forObservation, rampTB, forSimulation);
    measDataRef = referenceLeg->GetMeasurement();
 
    // Compute range for other leg
@@ -497,14 +497,11 @@ const MeasurementData& DeltaRangeAdapter::CalculateMeasurement(bool withEvents,
    otherOb->epoch = measDataRef.tPrecTimes[0].GetMjd();
 
    otherLeg->GetMeasurementModel()->SetTimeTagFlag(false); // transmission time is fixed
-   otherLeg->CalculateMeasurement(withLighttime, otherOb, rampTB, forSimulation); // TODO check error
+   otherLeg->CalculateMeasurement(withLighttime, otherOb, rampTB, forSimulation);
    measDataOther = otherLeg->GetMeasurement();
 
-   // TODO handle media correction in cMeasurement and in legs
-
    // Clear cMeasurement
-
-   // set to default
+   // TODO determine if we need to set any of these variables after clearing them
    cMeasurement.rangeVecs.clear();
    cMeasurement.tBodies.clear();
    cMeasurement.rBodies.clear();
@@ -513,7 +510,6 @@ const MeasurementData& DeltaRangeAdapter::CalculateMeasurement(bool withEvents,
    cMeasurement.tLocs.clear();
    cMeasurement.rLocs.clear();
 
-   // TODO implement blocking correctly
    cMeasurement.isFeasible = measDataRef.isFeasible && measDataOther.isFeasible;
    if (cMeasurement.isFeasible)
       cMeasurement.unfeasibleReason = "N";
@@ -525,15 +521,12 @@ const MeasurementData& DeltaRangeAdapter::CalculateMeasurement(bool withEvents,
       cMeasurement.unfeasibleReason = "B12";
    cMeasurement.feasibilityValue = std::min(measDataRef.feasibilityValue,
 					    measDataOther.feasibilityValue);
-
-   // TODO determine if something needs to be done with Bodies, PrecTimes, etc
+   
    cMeasurement.value.clear();
    cMeasurement.value.push_back(measDataRef.value[0] - measDataOther.value[0]);
    cMeasurement.correction.clear();
    cMeasurement.correction.push_back(measDataRef.correction[0] - measDataOther.correction[0]);
    
-   // TODO corrections
-
    cMeasurement.epochGT = measDataRef.epochGT; // this includes reference receiver rDelay
    cMeasurement.epoch = measDataRef.epoch;
 
