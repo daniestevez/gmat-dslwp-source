@@ -466,6 +466,24 @@ bool DeltaRangeAdapter::Initialize()
    return retval;
 }
 
+//------------------------------------------------------------------------------
+// const MeasurementData& CalculateMeasurement(bool withEvents,
+//       ObservationData* forObservation, std::vector<RampTableData>* rampTB)
+//------------------------------------------------------------------------------
+/**
+ * Computes the measurement associated with this adapter
+ *
+ * @note: The parameters associated with this call will probably be removed;
+ * they are here to support compatibility with the old measurement models
+ *
+ * @param withEvents Flag indicating is the light time solution should be
+ *                   included
+ * @param forObservation The observation data associated with this measurement
+ * @param rampTB Ramp table for a ramped measurement
+ *
+ * @return The computed measurement data
+ */
+//------------------------------------------------------------------------------
 const MeasurementData& DeltaRangeAdapter::CalculateMeasurement(bool withEvents,
    ObservationData* forObservation, std::vector<RampTableData>* rampTB,
    bool forSimulation)
@@ -842,4 +860,202 @@ void DeltaRangeAdapter::ComputeMeasurementNoiseSigma(const std::string noiseSigm
 
    // Clean up memory
    data.clear();
+}
+
+//------------------------------------------------------------------------------
+// const std::vector<RealArray>& CalculateMeasurementDerivatives(GmatBase* obj,
+//       Integer id)
+//------------------------------------------------------------------------------
+/**
+ * Computes measurement derivatives for a given parameter on a given object
+ *
+ * @param obj The object that has the w.r.t. parameter
+ * @param id  The ID of the w.r.t. parameter
+ *
+ * @return The derivative vector
+ */
+//------------------------------------------------------------------------------
+const std::vector<RealArray>& DeltaRangeAdapter::CalculateMeasurementDerivatives(
+      GmatBase* obj, Integer id)
+{
+   if (!calcData)
+      throw MeasurementException("Measurement derivative data was requested "
+            "for " + instanceName + " before the measurement was set");
+
+   Integer parmId = GetParmIdFromEstID(id, obj);
+   #ifdef DEBUG_DERIVATIVE_CALCULATION
+      MessageInterface::ShowMessage("Enter DeltaRangeAdapter::CalculateMeasurementDerivatives(%s, %d) called; parm ID is %d; Epoch %.12lf\n", obj->GetFullName().c_str(), id, parmId, cMeasurement.epoch);
+   #endif
+   
+   // Get parameter name specified by id
+   Integer parameterID;
+   if (id > 250)
+      parameterID = id - obj->GetType() * 250; // GetParmIdFromEstID(id, obj);
+   else
+      parameterID = id;
+   std::string paramName = obj->GetParameterText(parameterID);
+
+   #ifdef DEBUG_DERIVATIVE_CALCULATION
+      MessageInterface::ShowMessage("Solve-for parameter: %s\n", paramName.c_str());
+   #endif
+
+   // Clear derivative variable:
+   for (UnsignedInt i = 0; i < theDataDerivatives.size(); ++i)
+      theDataDerivatives[i].clear();
+   theDataDerivatives.clear();
+
+   if (paramName == "Bias")
+   {
+      // TODO: what is this? do we need it in DeltaRangeAdapter?
+      //if (((ErrorModel*)obj)->GetStringParameter("Type") == "TDRSDoppler_HZ")
+      if (((ErrorModel*)obj)->GetStringParameter("Type") == "SN_Doppler")
+         theDataDerivatives = calcData->CalculateMeasurementDerivatives(obj, id);
+      else
+      {
+         Integer size = obj->GetEstimationParameterSize(id);
+         RealArray oneRow;
+         oneRow.assign(size, 0.0);
+         theDataDerivatives.push_back(oneRow);
+      }
+   }
+   else
+   {
+
+      // Perform the calculations
+      // Derivative for reference leg
+      const std::vector<RealArray> *derivativeDataRef =
+         &(referenceLeg->CalculateMeasurementDerivatives(obj, id));
+      // Derivative for other leg
+      const std::vector<RealArray> *derivativeDataOther =
+         &(otherLeg->CalculateMeasurementDerivatives(obj, id));
+
+      // copy reference and other paths' derivatives
+      UnsignedInt size = derivativeDataRef->at(0).size();
+      std::vector<RealArray> derivativesRef;
+      for (UnsignedInt i = 0; i < derivativeDataRef->size(); ++i)
+      {
+         RealArray oneRow;
+         oneRow.assign(size, 0.0);
+         derivativesRef.push_back(oneRow);
+
+         if (derivativeDataRef->at(i).size() != size)
+            throw MeasurementException("Derivative data size is a different size "
+               "than expected");
+
+         for (UnsignedInt j = 0; j < size; ++j)
+         {
+            derivativesRef[i][j] = (derivativeDataRef->at(i))[j];
+         }
+      }
+   
+      size = derivativeDataOther->at(0).size();
+      std::vector<RealArray> derivativesOther;
+      for (UnsignedInt i = 0; i < derivativeDataOther->size(); ++i)
+      {
+         RealArray oneRow;
+         oneRow.assign(size, 0.0);
+         derivativesOther.push_back(oneRow);
+
+         if (derivativeDataOther->at(i).size() != size)
+            throw MeasurementException("Derivative data size is a different size "
+               "than expected");
+
+         for (UnsignedInt j = 0; j < size; ++j)
+         {
+            derivativesOther[i][j] = (derivativeDataOther->at(i))[j];
+         }
+      }
+
+      #ifdef DEBUG_ADAPTER_DERIVATIVES
+      MessageInterface::ShowMessage("   Derivatives Reference path: [");
+      for (UnsignedInt i = 0; i < derivativeDataRef->size(); ++i)
+      {
+         if (i > 0)
+            MessageInterface::ShowMessage("]\n                [");
+         for (UnsignedInt j = 0; j < derivativeDataRef->at(i).size(); ++j)
+         {
+            if (j > 0)
+               MessageInterface::ShowMessage(", ");
+            MessageInterface::ShowMessage("%.12le", (derivativeDataRef->at(i))[j]);
+         }
+      }
+      MessageInterface::ShowMessage("]\n");
+      MessageInterface::ShowMessage("   Derivatives Other path: [");
+      for (UnsignedInt i = 0; i < derivativeDataOther->size(); ++i)
+      {
+         if (i > 0)
+            MessageInterface::ShowMessage("]\n                [");
+         for (UnsignedInt j = 0; j < derivativeDataOther->at(i).size(); ++j)
+         {
+            if (j > 0)
+               MessageInterface::ShowMessage(", ");
+            MessageInterface::ShowMessage("%.12le", (derivativeDataOther->at(i))[j]);
+         }
+      }
+      MessageInterface::ShowMessage("]\n");
+      #endif
+
+      // Now assemble the derivative data into the requested derivative
+      size = derivativesRef[0].size();               // This is the size of derivative vector for signal path 0
+      
+      for (UnsignedInt i = 0; i < derivativesRef.size(); ++i)
+      {
+         // For each signal path, do the following steps:
+         RealArray oneRow;
+         oneRow.assign(size, 0.0);
+         theDataDerivatives.push_back(oneRow);
+
+         if (derivativesRef[i].size() != size)
+            throw MeasurementException("Derivative data size for Reference path is a different size "
+               "than expected");
+         if (derivativesOther[i].size() != size)
+            throw MeasurementException("Derivative data size for Other path is a different size "
+               "than expected");
+
+         for (UnsignedInt j = 0; j < size; ++j)
+         {
+            if ((paramName == "Position")||(paramName == "Velocity")||(paramName == "CartesianX"))
+            {
+               theDataDerivatives[i][j] = derivativesRef[i][j] - derivativesOther[i][j];
+            }
+            else
+            {
+	       // TODO: check if this is correct
+               theDataDerivatives[i][j] =  derivativesRef[i][j] - derivativesOther[i][j];
+            }
+         }
+
+	 // Cancel out derivatives wrt v
+	 // these are small and difficult to compute so we approximate them as zero
+	 if (paramName == "Velocity")
+	 {
+	   for (UnsignedInt j = 0; j < size; ++j) theDataDerivatives[i][j] = 0.0;
+	 }
+	 else if (paramName == "CartesianX")
+	 {
+	   for (UnsignedInt j = 3; j < size; ++j) theDataDerivatives[i][j] = 0.0;
+	 }
+      }
+   }
+
+   #ifdef DEBUG_DERIVATIVE_CALCULATION
+      for (UnsignedInt i = 0; i < theDataDerivatives.size(); ++i)
+      {
+         MessageInterface::ShowMessage("Derivative for path %dth:\n", i);
+         MessageInterface::ShowMessage("[");
+         for (UnsignedInt j = 0; j < theDataDerivatives[i].size(); ++j)
+         {
+            MessageInterface::ShowMessage("    %.12lf", theDataDerivatives[i][j]);
+            MessageInterface::ShowMessage("%s", ((j == theDataDerivatives[i].size()-1)?"":","));
+         }
+         MessageInterface::ShowMessage("]\n");
+      }
+      
+   #endif
+
+   #ifdef DEBUG_DERIVATIVE_CALCULATION
+      MessageInterface::ShowMessage("Exit DeltaRangeAdapter::CalculateMeasurementDerivatives():\n");
+   #endif
+
+   return theDataDerivatives;
 }

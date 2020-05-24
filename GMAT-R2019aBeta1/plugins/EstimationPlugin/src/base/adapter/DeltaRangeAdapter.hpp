@@ -58,7 +58,10 @@ public:
       ObservationData* forObservation = NULL,
       std::vector<RampTableData>* rampTB = NULL,
       bool forSimulation = false);
-
+   virtual const std::vector<RealArray>&
+                        CalculateMeasurementDerivatives(GmatBase *obj,
+                              Integer id);
+   
    virtual void SetCorrection(const std::string& correctionName, const std::string& correctionType);
 
    RangeAdapterKm* referenceLeg; // Leg that is used to timetag the measurement at time of reception
