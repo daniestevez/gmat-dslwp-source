@@ -402,7 +402,7 @@ void DeltaRangeAdapter::SetPropagator(PropSetup* ps)
 {
    #ifdef DEBUG_INITIALIZATION
       MessageInterface::ShowMessage("Setting propagator to %p in "
-            "TDRSDopplerAdapter\n", ps);
+            "DeltaRangeAdapter\n", ps);
    #endif
 
    referenceLeg->SetPropagator(ps);
