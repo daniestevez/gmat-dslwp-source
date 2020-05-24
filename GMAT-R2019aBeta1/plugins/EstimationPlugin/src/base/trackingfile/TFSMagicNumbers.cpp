@@ -264,6 +264,7 @@ StringArray TFSMagicNumbers::GetAvailableTypes()
    //availableTypes.push_back("RightAscension");               // made changes by TUAN NGUYEN
    //availableTypes.push_back("Declination");                  // made changes by TUAN NGUYEN
    availableTypes.push_back("DeltaRange");
+   availableTypes.push_back("DeltaRangeRate");
 
    Integer runmode = GmatGlobal::Instance()->GetRunModeStartUp();        // fix bug: GMT-5955   // made changes by TUAN NGUYEN
    if (runmode == GmatGlobal::TESTING)                                   // fix bug: GMT-5955   // made changes by TUAN NGUYEN
@@ -477,6 +478,7 @@ void TFSMagicNumbers::SetType(ObservationData* forData)
 
 // Delta measurement types
 #define   DELTARANGE_TYPE_INDEX           MAGIC_NUMBER_BASE+30
+#define   DELTARANGERATE_TYPE_INDEX       MAGIC_NUMBER_BASE+31
 
 TFSMagicNumbers::TFSMagicNumbers() :
    lastNumber        (MAGIC_NUMBER_BASE)
@@ -1027,6 +1029,26 @@ TFSMagicNumbers::TFSMagicNumbers() :
    nodes.push_back("T2");
    lue->nodes.push_back(nodes);
    lue->type = "DeltaRange";                         // Deltarange measurement
+   lue->multFactor = 1.0;
+   lue->magicNumber = lastNumber;
+   if (find(knownTypes.begin(), knownTypes.end(), lue->type) == knownTypes.end())
+      knownTypes.push_back(lue->type);
+
+   lookupTable.push_back(lue);
+   magicNumbers.push_back(lastNumber);
+
+   // Deltarange rate
+   lastNumber = DELTARANGERATE_TYPE_INDEX;
+   lue = new LookupEntry;
+   lue->arbitraryCount = true;
+   lue->signalPathCount = 1;
+   lue->nodeCount = 2;
+   nodes.clear();
+   nodes.push_back("T1");
+   nodes.push_back("S1");
+   nodes.push_back("T2");
+   lue->nodes.push_back(nodes);
+   lue->type = "DeltaRangeRate";                     // Deltarange rate measurement
    lue->multFactor = 1.0;
    lue->magicNumber = lastNumber;
    if (find(knownTypes.begin(), knownTypes.end(), lue->type) == knownTypes.end())

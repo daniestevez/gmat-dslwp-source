@@ -70,6 +70,12 @@ public:
 protected:
    void                 ComputeMeasurementBias(const std::string biasName, const std::string measType, Integer numTrip);
    void                 ComputeMeasurementNoiseSigma(const std::string noiseSigmaName, const std::string measType, Integer numTrip);
+
+   /// Parameter IDs for the RangeAdapterKm
+   enum
+   {
+      DeltaRangeAdapterParamCount = RangeAdapterKmParamCount,
+   };
    
 private:
    // Measurement data for reference leg and other leg

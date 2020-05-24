@@ -3429,6 +3429,8 @@ std::string Estimator::GetElementUnit(ListItem* infor, std::string stateType) co
             unit = "Hz";
 	 else if (mm->IsOfType("DeltaRange"))
 	    unit = "km";
+	 else if (mm->IsOfType("DeltaRangeRate"))
+	    unit = "km/s";
          else
             unit = "****";
       }
@@ -6265,6 +6267,8 @@ std::string Estimator::GetUnit(const std::string type) const
       unit = "deg";
    else if (type == "DeltaRange")
       unit = "km";
+   else if (type == "DeltaRangeRate")
+      unit = "km/s";
 
    return unit;
 }

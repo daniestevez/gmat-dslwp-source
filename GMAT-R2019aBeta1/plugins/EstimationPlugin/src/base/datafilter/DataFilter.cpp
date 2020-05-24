@@ -1430,6 +1430,7 @@ StringArray DataFilter::GetListOfMeasurementTypes()
    //typeList.push_back("RightAscension");                          // made changes by TUAN NGUYEN
    //typeList.push_back("Declination");                             // made changes by TUAN NGUYEN
    typeList.push_back("DeltaRange");
+   typeList.push_back("DeltaRangeRate");
    
    Integer runmode = GmatGlobal::Instance()->GetRunModeStartUp();
    if (runmode == GmatGlobal::TESTING)

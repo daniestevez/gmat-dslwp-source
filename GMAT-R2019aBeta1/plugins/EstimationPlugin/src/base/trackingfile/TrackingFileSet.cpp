@@ -44,6 +44,7 @@
 #include "RightAscAdapter.hpp"
 #include "DeclinationAdapter.hpp"
 #include "DeltaRangeAdapter.hpp"
+#include "DeltaRangeRateAdapter.hpp"
 
 //#define DEBUG_CONSTRUCTION
 //#define DEBUG_INITIALIZATION
@@ -2341,7 +2342,8 @@ bool TrackingFileSet::Initialize()
 
          // Set doppler count interval for Doppler
          //if ((measType == "DSN_TCP") || (measType == "RangeRate") || (measType == "TDRSDoppler_HZ"))
-         if ((measType == "DSN_TCP")||(measType == "RangeRate")||(measType == "SN_Doppler"))
+         if ((measType == "DSN_TCP")||(measType == "RangeRate")||(measType == "SN_Doppler")
+	     ||(measType == "DeltaRangeRate"))
          {
             measurements[i]->SetRealParameter("DopplerCountInterval", dopplerCountInterval);
          }
@@ -2749,6 +2751,29 @@ TrackingDataAdapter* TrackingFileSet::BuildAdapter(const StringArray& strand,
 	 otherStrand.push_back(strand[2]);
 	 ((DeltaRangeAdapter*)retval)->referenceLeg = (RangeAdapterKm*)BuildAdapter(referenceStrand, "Range", configIndex);
 	 ((DeltaRangeAdapter*)retval)->otherLeg = (RangeAdapterKm*)BuildAdapter(otherStrand, "Range", configIndex);
+      }
+   }
+   else if (type == "DeltaRangeRate")                             // It is DeltaRangeRate
+   {
+      retval = new DeltaRangeRateAdapter(adapterName);
+      if (retval)
+      {
+         retval->UsesLightTime(useLighttime);
+         retval->SetStringParameter("MeasurementType", type);
+
+	 StringArray referenceStrand, otherStrand;
+	 if (strand.size() != 3)
+	   throw MeasurementException("Error: Signal path does not contain 3 participants.\n");
+	 referenceStrand.push_back(strand[1]);
+	 referenceStrand.push_back(strand[0]);
+	 otherStrand.push_back(strand[1]);
+	 otherStrand.push_back(strand[2]);
+	 ((DeltaRangeAdapter*)retval)->referenceLeg = (RangeAdapterKm*)BuildAdapter(referenceStrand, "Range", configIndex);
+	 ((DeltaRangeAdapter*)retval)->otherLeg = (RangeAdapterKm*)BuildAdapter(otherStrand, "Range", configIndex);
+	 ((DeltaRangeRateAdapter*)retval)->adapterS = new DeltaRangeAdapter("DeltaRange");
+	 ((DeltaRangeRateAdapter*)retval)->adapterS->referenceLeg = (RangeAdapterKm*)BuildAdapter(referenceStrand, "Range", configIndex);
+	 ((DeltaRangeRateAdapter*)retval)->adapterS->otherLeg = (RangeAdapterKm*)BuildAdapter(otherStrand, "Range", configIndex);
+
       }
    }
    else                                                               

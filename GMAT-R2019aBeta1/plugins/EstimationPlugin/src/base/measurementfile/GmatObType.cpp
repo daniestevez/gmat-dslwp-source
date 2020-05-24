@@ -373,7 +373,8 @@ bool GmatObType::AddMeasurement(MeasurementData *md)
       dataLine << md->participantIDs[j] << "    ";
 #endif
 
-   if ((md->typeName == "DSN_TCP")||(md->typeName == "RangeRate"))
+   if ((md->typeName == "DSN_TCP")||(md->typeName == "RangeRate")
+       ||(md->typeName == "DeltaRangeRate"))
    {
       dataLine << md->uplinkBand << "    ";
       dataLine << md->dopplerCountInterval << "    ";
@@ -574,7 +575,7 @@ ObservationData* GmatObType::ReadObservation()
          || (currentObs.typeName == "XEast") || (currentObs.typeName == "YNorth")
          || (currentObs.typeName == "XSouth") || (currentObs.typeName == "YEast")
          || (currentObs.typeName == "RightAscension") || (currentObs.typeName == "Declination")
-	  || (currentObs.typeName == "DeltaRange"))
+         || (currentObs.typeName == "DeltaRange") || (currentObs.typeName == "DeltaRangeRate"))
       {
          dataSize = 1;
       }
@@ -646,7 +647,7 @@ ObservationData* GmatObType::ReadObservation()
       theLine >> currentObs.dopplerCountInterval;
       currentObs.unit = "Hz";
    }
-   else if (currentObs.typeName == "RangeRate")      //else if (currentObs.typeName == "Doppler_RangeRate")
+   else if ((currentObs.typeName == "RangeRate") || (currentObs.typeName == "DeltaRangeRate"))      //else if (currentObs.typeName == "Doppler_RangeRate")
    {
       theLine >> currentObs.uplinkBand;
       theLine >> currentObs.dopplerCountInterval;
@@ -710,7 +711,8 @@ ObservationData* GmatObType::ReadObservation()
          //MessageInterface::ShowMessage("   %d   %.12le   %.12le", currentObs.uplinkBand, currentObs.uplinkFreq, currentObs.rangeModulo);
          MessageInterface::ShowMessage("   %d   %.12le   %.12le", currentObs.uplinkBand, currentObs.uplinkFreqAtRecei, currentObs.rangeModulo);
       }
-      else if ((currentObs.typeName == "DSN_TCP")||(currentObs.typeName == "RangeRate"))    //else if ((currentObs.typeName == "DSN_TCP")||(currentObs.typeName == "Doppler_RangeRate"))
+      else if ((currentObs.typeName == "DSN_TCP")||(currentObs.typeName == "RangeRate")
+	       ||(currentObs.typeName == "DeltaRangeRate"))    //else if ((currentObs.typeName == "DSN_TCP")||(currentObs.typeName == "Doppler_RangeRate"))
       {
          MessageInterface::ShowMessage("   %d   %.12le", currentObs.uplinkBand, currentObs.dopplerCountInterval);
       }

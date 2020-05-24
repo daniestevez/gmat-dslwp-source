@@ -237,6 +237,7 @@ CPP_OBJECTS = \
         adapter/RangeRateAdapterKps.o \
         adapter/AngleAdapterDeg.o \
         adapter/DeltaRangeAdapter.o \
+	adapter/DeltaRangeRateAdapter.o \
         errormodel/ErrorModel.o \
         hardware/RFHardware.o \
         hardware/Receiver.o \
