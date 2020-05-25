@@ -302,8 +302,28 @@ bool DeltaRangeRateAdapter::SetStringParameter(const Integer id, const std::stri
 {
    // Note that: measurement type of adapter is always ("Doppler_RangeRate") "RangeRate", so it does not need to change
    bool retval = true;
-   if (id != MEASUREMENT_TYPE)
+   MeasureModel* tempCalcData;
+   MeasureModel* oldCalcData;
+
+   if (id == SIGNAL_PATH)
+   {
+      // put temporarily a cloned calcData in adapterS to prevent
+      // adding to the strand
+      // (adapterS and this share the same calcData)
+      tempCalcData = (MeasureModel*)adapterS->GetMeasurementModel()->Clone();
+      oldCalcData = adapterS->GetMeasurementModel();
+      adapterS->SetMeasurement(tempCalcData);
+   }
+      
+   if ((id != MEASUREMENT_TYPE))
       retval = adapterS->SetStringParameter(id, value);
+
+   if (id == SIGNAL_PATH)
+   {
+      // restore things
+      adapterS->SetMeasurement(oldCalcData);
+      delete tempCalcData;
+   }
 
    retval = DeltaRangeAdapter::SetStringParameter(id, value) && retval;
 
