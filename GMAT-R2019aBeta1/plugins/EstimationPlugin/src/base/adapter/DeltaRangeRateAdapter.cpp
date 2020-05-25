@@ -97,7 +97,13 @@ DeltaRangeRateAdapter::~DeltaRangeRateAdapter()
 #endif
 
    if (adapterS)
+   {
+      // prevent deletion of adapterS from deleting its calcData
+      // which we share as this->calcData
+      // we create and assign a new MeasureModel just to be destroyed
+      adapterS->SetMeasurement(new MeasureModel("throwaway"));
       delete adapterS;
+   }
 }
 
 
