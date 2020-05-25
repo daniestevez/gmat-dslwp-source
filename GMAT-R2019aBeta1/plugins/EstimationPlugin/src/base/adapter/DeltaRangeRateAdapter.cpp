@@ -959,7 +959,7 @@ const std::vector<RealArray>& DeltaRangeRateAdapter::CalculateMeasurementDerivat
    {
       // Perform the calculations
       const std::vector<RealArray> *derivativeDataE =
-         &(calcData->CalculateMeasurementDerivatives(obj, id));
+         &(DeltaRangeAdapter::CalculateMeasurementDerivatives(obj, id));
 
       const std::vector<RealArray> *derivativeDataS =
          &(adapterS->CalculateMeasurementDerivatives(obj, id));
