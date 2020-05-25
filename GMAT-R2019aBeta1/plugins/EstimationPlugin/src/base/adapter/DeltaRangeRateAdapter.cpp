@@ -760,10 +760,6 @@ const MeasurementData& DeltaRangeRateAdapter::CalculateMeasurement(bool withEven
    obData->epochGT = tm;
    obData->epoch   = tm.GetMjd();
    
-   // Set doppler count interval to MeasureModel object due to the Start-path
-   // is measured earlier by number of seconds shown in doppler count interval
-   //adapterS->referenceLeg->GetMeasurementModel()->SetCountInterval(dopplerCountInterval);
-   //adapterS->otherLeg->GetMeasurementModel()->SetCountInterval(dopplerCountInterval);
    // For Start-path, range calculation does not add bias and noise to calculated value
    // Note that: default option is no adding noise
    adapterS->AddBias(false);
