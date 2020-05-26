@@ -925,7 +925,17 @@ const std::vector<RealArray>& DeltaRangeAdapter::CalculateMeasurementDerivatives
       // Derivative for reference leg
       const std::vector<RealArray> *derivativeDataRef =
          &(referenceLeg->CalculateMeasurementDerivatives(obj, id));
+
       // Derivative for other leg
+
+      // First we need to set up the STM for the other leg:
+      // it must coincide with the STM for the reference leg
+      otherLeg->GetMeasurementModel()->GetSignalData()[0]->tSTM =
+	referenceLeg->GetMeasurementModel()->GetSignalData()[0]->tSTM;
+      otherLeg->GetMeasurementModel()->GetSignalData()[0]->tSTMtm =
+	referenceLeg->GetMeasurementModel()->GetSignalData()[0]->tSTMtm;
+
+      // now we can compte the derivative as usual
       const std::vector<RealArray> *derivativeDataOther =
          &(otherLeg->CalculateMeasurementDerivatives(obj, id));
 
@@ -1024,17 +1034,6 @@ const std::vector<RealArray>& DeltaRangeAdapter::CalculateMeasurementDerivatives
                theDataDerivatives[i][j] =  derivativesRef[i][j] - derivativesOther[i][j];
             }
          }
-
-	 // Cancel out derivatives wrt v
-	 // these are small and difficult to compute so we approximate them as zero
-	 if (paramName == "Velocity")
-	 {
-	   for (UnsignedInt j = 0; j < size; ++j) theDataDerivatives[i][j] = 0.0;
-	 }
-	 else if (paramName == "CartesianX")
-	 {
-	   for (UnsignedInt j = 3; j < size; ++j) theDataDerivatives[i][j] = 0.0;
-	 }
       }
    }
 
