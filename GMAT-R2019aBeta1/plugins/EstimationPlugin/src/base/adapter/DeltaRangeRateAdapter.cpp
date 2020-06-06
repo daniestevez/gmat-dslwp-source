@@ -775,9 +775,8 @@ const MeasurementData& DeltaRangeRateAdapter::CalculateMeasurement(bool withEven
    #ifdef DEBUG_RANGERATE_CALCULATION
       MessageInterface::ShowMessage("Compute range for S-Path...\n");
    #endif
-   // Measurement time is subtracted dopplerCountInterval seconds
+   // Measurement time isthe same one as for the End path
    GmatTime tm = cMeasurement.epochGT;       // Get measurement time
-   tm -= dopplerCountInterval / 86400.0;
    ObservationData* obData = NULL;
    if (forObservation)
       obData = new ObservationData(*forObservation);
@@ -785,6 +784,12 @@ const MeasurementData& DeltaRangeRateAdapter::CalculateMeasurement(bool withEven
       obData = new ObservationData();
    obData->epochGT = tm;
    obData->epoch   = tm.GetMjd();
+
+   // Set Doppler count interval
+   // Start path is measured earlier by number of seconds shown in Doppler count interval
+   adapterS->referenceLeg->GetMeasurementModel()->SetCountInterval(dopplerCountInterval);
+   // adapterS->otherLeg does not need dopplerCountInterval because its transmission
+   // time comes determined by the transmission time of adapterS->referenceLeg
    
    // For Start-path, range calculation does not add bias and noise to calculated value
    // Note that: default option is no adding noise
